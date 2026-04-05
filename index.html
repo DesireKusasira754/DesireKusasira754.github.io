@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desire Kusasira — Project Management Consultant</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0e0c;
+    --paper: #f5f2ec;
+    --cream: #ede9df;
+    --accent: #b5622a;
+    --accent-light: #d4895a;
+    --muted: #7a7570;
+    --line: #d4cfc5;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    opacity: 0.5;
+    transition: width 0.3s, height 0.3s;
+  }
+
+  /* ── TICKER ── */
+  .ticker {
+    background: var(--accent);
+    color: var(--paper);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0.55rem 0;
+  }
+  .ticker-inner {
+    display: inline-flex;
+    animation: ticker 30s linear infinite;
+  }
+  .ticker-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0 2.5rem;
+  }
+  .ticker-sep { color: rgba(255,255,255,0.35); }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 4rem;
+    background: rgba(245,242,236,0.93);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line);
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 2px 28px rgba(0,0,0,0.07); }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+    position: relative;
+    padding-bottom: 2px;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+  .nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+
+  .nav-avail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #5a8a5a;
+  }
+  .avail-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #5a8a5a;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.35); }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-top: 57px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hero-left {
+    padding: 8rem 4rem 6rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .hero-left::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.25;
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    position: relative;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+  .hero-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 5vw, 5.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1.8rem;
+    position: relative;
+    animation: fadeUp 0.6s ease 0.25s both;
+  }
+  .hero-name span { display: block; color: var(--accent); }
+
+  .hero-desc {
+    font-size: 1.2rem;
+    font-weight: 300;
+    color: var(--muted);
+    max-width: 420px;
+    line-height: 1.8;
+    margin-bottom: 3rem;
+    position: relative;
+    animation: fadeUp 0.6s ease 0.4s both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    position: relative;
+    animation: fadeUp 0.6s ease 0.55s both;
+  }
+
+  .hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    transition: background 0.25s;
+  }
+  .hero-cta:hover { background: var(--accent); }
+  .hero-cta .arrow { transition: transform 0.2s; }
+  .hero-cta:hover .arrow { transform: translateX(4px); }
+
+  .hero-cta-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 1rem 2rem;
+    transition: border-color 0.25s, color 0.25s;
+  }
+  .hero-cta-ghost:hover { border-color: var(--ink); color: var(--ink); }
+
+  .hero-right {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 4rem;
+    background: var(--cream);
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+  .hero-right::before {
+    content: 'PM';
+    position: absolute;
+    top: -0.1em; right: -0.05em;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22vw;
+    color: var(--line);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero-cert {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    padding: 0.9rem 1.2rem;
+    width: fit-content;
+  }
+  .hero-cert-badge {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--paper);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .hero-cert-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .hero-cert-text strong { display: block; color: var(--ink); font-weight: 500; }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    position: relative;
+    z-index: 1;
+  }
+  .stat {
+    background: var(--paper);
+    padding: 2rem 1.5rem;
+    transition: background 0.2s;
+  }
+  .stat:hover { background: #fff; }
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.8rem;
+    line-height: 1;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION ── */
+  section { padding: 7rem 4rem; border-bottom: 1px solid var(--line); }
+  .section-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 4rem; }
+  .section-num { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--accent); letter-spacing: 0.1em; }
+  .section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 2.2rem; letter-spacing: -0.02em; }
+
+  /* ── VALUE BAND ── */
+  .value-band {
+    background: var(--cream);
+    border-bottom: 1px solid var(--line);
+    padding: 5rem 4rem;
+  }
+  .value-band-inner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .value-item {
+    padding: 2.5rem;
+    border-right: 1px solid var(--line);
+    position: relative;
+  }
+  .value-item:last-child { border-right: none; }
+  .value-item::before {
+    content: attr(data-num);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 5rem;
+    color: var(--line);
+    position: absolute;
+    top: 1rem; right: 1.5rem;
+    line-height: 1;
+    pointer-events: none;
+  }
+  .value-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.7rem;
+    letter-spacing: -0.01em;
+  }
+  .value-desc { font-size: 0.95rem; font-weight: 300; color: var(--muted); line-height: 1.8; }
+
+  /* ── ABOUT ── */
+  #about { display: grid; grid-template-columns: 1fr 2fr; gap: 6rem; align-items: start; }
+  #about .section-header { flex-direction: column; gap: 0.5rem; margin-bottom: 0; }
+  .about-body p { font-size: 1.2rem; font-weight: 300; color: #3a3733; margin-bottom: 1.5rem; line-height: 1.9; }
+  .about-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 2.5rem; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border: 1px solid var(--line);
+    padding: 0.4rem 0.9rem;
+    color: var(--muted);
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    cursor: default;
+  }
+  .tag:hover { border-color: var(--accent); color: var(--accent); background: rgba(181,98,42,0.05); }
+
+  /* ── SERVICES ── */
+  #services { background: var(--ink); }
+  #services .section-title { color: var(--paper); }
+  #services .section-num { color: var(--accent-light); }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .service-card {
+    background: #1a1916;
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .service-card:hover { background: #222018; }
+  .service-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 2px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+  }
+  .service-card:hover::after { width: 100%; }
+  .service-num { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: #3a3733; letter-spacing: 0.1em; margin-bottom: 1.5rem; }
+  .service-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--paper); margin-bottom: 1rem; }
+  .service-desc { font-size: 1rem; font-weight: 300; color: #8a857e; line-height: 1.8; }
+
+  /* ── PROCESS ── */
+  #process { background: var(--paper); }
+  .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .process-step { padding: 2.5rem 2rem; border-right: 1px solid var(--line); }
+  .process-step:last-child { border-right: none; }
+  .step-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3.5rem; color: var(--line); line-height: 1; margin-bottom: 1rem; }
+  .step-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.7rem; }
+  .step-desc { font-size: 0.95rem; font-weight: 300; color: var(--muted); line-height: 1.8; }
+
+  /* ── EXPERIENCE ── */
+  .exp-list { display: flex; flex-direction: column; }
+  .exp-item {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 3rem;
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .exp-item:first-child { border-top: 1px solid var(--line); }
+  .exp-meta { padding-top: 0.3rem; }
+  .exp-period { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.4rem; }
+  .exp-location { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin-bottom: 1rem; }
+  .exp-type { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--line); padding: 0.25rem 0.6rem; color: var(--muted); }
+  .exp-role { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.3rem; letter-spacing: -0.01em; margin-bottom: 0.3rem; }
+  .exp-company { font-family: 'DM Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; }
+  .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .exp-bullets li { font-size: 1rem; font-weight: 300; color: #4a4640; padding-left: 1.2rem; position: relative; line-height: 1.7; }
+  .exp-bullets li::before { content: '—'; position: absolute; left: 0; color: var(--accent); font-size: 0.8rem; }
+
+  /* ── SKILLS ── */
+  #skills { background: var(--cream); }
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3rem; }
+  .skill-group-title { font-family: 'DM Mono', monospace; font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--line); }
+  .skill-list { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
+  .skill-list li { font-size: 1rem; font-weight: 300; color: #3a3733; display: flex; align-items: center; gap: 0.6rem; }
+  .skill-list li::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+  /* ── CONTACT ── */
+  #contact {
+    background: var(--ink);
+    text-align: center;
+    padding: 8rem 4rem;
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
+  }
+  #contact::before {
+    content: 'HIRE';
+    position: absolute;
+    bottom: -0.15em; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 28vw;
+    color: #1a1916;
+    line-height: 1;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .contact-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 1.5rem; position: relative; }
+  .contact-heading { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2.5rem, 5vw, 5rem); line-height: 1; letter-spacing: -0.03em; color: var(--paper); margin-bottom: 1.5rem; position: relative; }
+  .contact-heading em { font-style: italic; color: var(--accent); font-family: 'Cormorant Garamond', serif; font-weight: 300; }
+  .contact-sub { font-size: 1.1rem; font-weight: 300; color: #7a7570; margin-bottom: 3.5rem; max-width: 480px; margin-left: auto; margin-right: auto; position: relative; }
+  .contact-links { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; position: relative; }
+  .contact-btn { font-family: 'DM Mono', monospace; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; text-decoration: none; padding: 1rem 2.2rem; border: 1px solid; transition: all 0.25s; }
+  .contact-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--paper); }
+  .contact-btn.primary:hover { background: var(--accent-light); border-color: var(--accent-light); }
+  .contact-btn.secondary { background: transparent; border-color: #3a3733; color: #7a7570; }
+  .contact-btn.secondary:hover { border-color: var(--paper); color: var(--paper); }
+
+  /* ── FOOTER ── */
+  footer { background: var(--ink); border-top: 1px solid #1f1e1b; padding: 2rem 4rem; display: flex; justify-content: space-between; align-items: center; }
+  footer p { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.1em; color: #3a3733; text-transform: uppercase; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1024px) {
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    .process-steps { grid-template-columns: 1fr 1fr; }
+    .process-step:nth-child(2) { border-right: none; }
+    .process-step { border-bottom: 1px solid var(--line); }
+    .value-band-inner { grid-template-columns: 1fr; }
+    .value-item { border-right: none; border-bottom: 1px solid var(--line); }
+    .value-item:last-child { border-bottom: none; }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links, .nav-avail { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-left { padding: 6rem 1.5rem 3rem; border-right: none; border-bottom: 1px solid var(--line); }
+    .hero-right { padding: 2.5rem 1.5rem; }
+    #about { grid-template-columns: 1fr; gap: 2rem; padding: 4rem 1.5rem; }
+    section { padding: 4rem 1.5rem; }
+    .exp-item { grid-template-columns: 1fr; gap: 1rem; }
+    .services-grid, .skills-grid { grid-template-columns: 1fr; }
+    .process-steps { grid-template-columns: 1fr; }
+    .process-step { border-right: none; }
+    footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
+    .cursor, .cursor-ring { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- TICKER -->
+<div style="height:57px;"></div><!-- nav spacer -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">PMP Certified</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Available for Consulting</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Agile &amp; Scrum</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Program Delivery</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Stakeholder Alignment</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Process Optimization</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Based in Burnaby BC</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Remote-Ready</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">PMP Certified</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Available for Consulting</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Agile &amp; Scrum</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Program Delivery</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Stakeholder Alignment</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Process Optimization</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Based in Burnaby BC</span><span class="ticker-sep"> · </span>
+    <span class="ticker-item">Remote-Ready</span><span class="ticker-sep"> · </span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">DK</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-avail">
+    <span class="avail-dot"></span>
+    Available now
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" style="padding-top:0; margin-top:-57px;">
+  <div class="hero-left">
+    <p class="hero-eyebrow">Project Management Consultant · PMP Certified</p>
+    <h1 class="hero-name">Desire<span>Kusasira</span></h1>
+    <p class="hero-desc">Helping organizations deliver better projects — on time, aligned, and built to last.</p>
+    <div class="hero-actions">
+      <a href="#contact" class="hero-cta">Work With Me <span class="arrow">→</span></a>
+      <a href="#experience" class="hero-cta-ghost">View Experience</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-cert">
+      <div class="hero-cert-badge">PMP</div>
+      <div class="hero-cert-text">
+        <strong>PMP Certified</strong>
+        Project Management Professional · PMI
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-number">6+</div><div class="stat-label">Years Experience</div></div>
+      <div class="stat"><div class="stat-number">3</div><div class="stat-label">Industries Served</div></div>
+      <div class="stat"><div class="stat-number">30%</div><div class="stat-label">Engagement Uplift</div></div>
+      <div class="stat"><div class="stat-number">100k+</div><div class="stat-label">Customers Supported</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUE BAND -->
+<div class="value-band">
+  <div class="value-band-inner">
+    <div class="value-item reveal" data-num="1">
+      <div class="value-title">Structure Without Bureaucracy</div>
+      <p class="value-desc">I bring the right amount of process — enough to create clarity and accountability, not so much that it slows you down.</p>
+    </div>
+    <div class="value-item reveal reveal-delay-2" data-num="2">
+      <div class="value-title">People-First Delivery</div>
+      <p class="value-desc">Projects are delivered by people. I keep teams aligned, motivated, and moving — especially in complex or high-pressure environments.</p>
+    </div>
+    <div class="value-item reveal reveal-delay-3" data-num="3">
+      <div class="value-title">Cross-Industry Perspective</div>
+      <p class="value-desc">Banking, non-profit, and digital product experience gives me a wide lens — I bring what works across contexts, not just what's familiar.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div>
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">About</h2>
+    </div>
+  </div>
+  <div class="about-body reveal">
+    <p>I'm a PMP-certified Project Management professional with over 6 years of experience delivering programs and projects across banking, non-profit, and digital product environments.</p>
+    <p>Whether you need someone to steer a complex initiative from kickoff to close, bring structure to a team running on instinct, or act as a delivery partner embedded in your operations — I bring the tools, the methodology, and the people skills to make it work.</p>
+    <p>I'm currently based in Burnaby, BC and available for freelance and consulting engagements — both remote and local.</p>
+    <div class="about-tags">
+      <span class="tag">Agile / Scrum</span>
+      <span class="tag">Stakeholder Engagement</span>
+      <span class="tag">Risk Management</span>
+      <span class="tag">Program Delivery</span>
+      <span class="tag">Process Improvement</span>
+      <span class="tag">Budget Oversight</span>
+      <span class="tag">PMP Certified</span>
+      <span class="tag">Remote Teams</span>
+      <span class="tag">RAID Logs</span>
+      <span class="tag">RACI Charts</span>
+      <span class="tag">KPI Tracking</span>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header">
+    <span class="section-num">02</span>
+    <h2 class="section-title">What I Offer</h2>
+  </div>
+  <div class="services-grid">
+    <div class="service-card reveal"><div class="service-num">01</div><h3 class="service-title">Project &amp; Program Management</h3><p class="service-desc">End-to-end delivery support using Agile, Scrum, or structured frameworks. From planning and scoping to execution and closeout — I keep things moving and teams aligned.</p></div>
+    <div class="service-card reveal reveal-delay-1"><div class="service-num">02</div><h3 class="service-title">Delivery Operations</h3><p class="service-desc">I embed within your team to manage workflows, track KPIs, maintain RAID logs, and ensure accountability across the delivery cycle. Ideal for growing organizations that need structure without bureaucracy.</p></div>
+    <div class="service-card reveal reveal-delay-2"><div class="service-num">03</div><h3 class="service-title">Process &amp; Workflow Optimization</h3><p class="service-desc">Mapping, reviewing, and redesigning operational workflows to close service gaps, reduce inefficiencies, and improve overall program outcomes.</p></div>
+    <div class="service-card reveal"><div class="service-num">04</div><h3 class="service-title">Stakeholder &amp; Communications Management</h3><p class="service-desc">Developing comms plans, managing reporting rhythms, and keeping stakeholders informed and engaged throughout a project lifecycle.</p></div>
+    <div class="service-card reveal reveal-delay-1"><div class="service-num">05</div><h3 class="service-title">Agile Coaching &amp; Facilitation</h3><p class="service-desc">Facilitating sprint ceremonies, coaching teams on Agile principles, and helping organizations transition to iterative ways of working.</p></div>
+    <div class="service-card reveal reveal-delay-2"><div class="service-num">06</div><h3 class="service-title">Reporting &amp; Performance Tracking</h3><p class="service-desc">Building KPI frameworks and impact reports that give leadership the visibility they need to make confident decisions.</p></div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-header">
+    <span class="section-num">03</span>
+    <h2 class="section-title">How I Work</h2>
+  </div>
+  <div class="process-steps">
+    <div class="process-step reveal"><div class="step-num">01</div><div class="step-title">Discover &amp; Scope</div><p class="step-desc">I start by understanding your goals, constraints, and team dynamics — then define clear scope, success metrics, and a delivery roadmap.</p></div>
+    <div class="process-step reveal reveal-delay-1"><div class="step-num">02</div><div class="step-title">Plan &amp; Structure</div><p class="step-desc">I put the right framework in place — whether Agile sprints, a structured plan, or a hybrid — and set up tools, RACI, and reporting rhythms.</p></div>
+    <div class="process-step reveal reveal-delay-2"><div class="step-num">03</div><div class="step-title">Execute &amp; Track</div><p class="step-desc">I manage day-to-day delivery, monitor KPIs, track risks, and keep stakeholders aligned — removing blockers so the team can focus on delivering.</p></div>
+    <div class="process-step reveal reveal-delay-3"><div class="step-num">04</div><div class="step-title">Close &amp; Improve</div><p class="step-desc">At closeout, I run retrospectives, document lessons learned, and leave your team with processes and knowledge that outlast the engagement.</p></div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header">
+    <span class="section-num">04</span>
+    <h2 class="section-title">Experience</h2>
+  </div>
+  <div class="exp-list">
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <div class="exp-period">Aug 2024 — Present</div>
+        <div class="exp-location">Vancouver, BC</div>
+        <div class="exp-type">Full-time</div>
+      </div>
+      <div>
+        <div class="exp-role">Program Manager</div>
+        <div class="exp-company">Atira Women's Resource Society</div>
+        <ul class="exp-bullets">
+          <li>Oversaw day-to-day program operations supporting 80 residents, ensuring service delivery aligned with organizational standards and community needs.</li>
+          <li>Supervised and coordinated staff and service providers, resolving operational challenges and improving consistency across shifts.</li>
+          <li>Monitored performance across 15 KPIs, implementing improvements that increased resident engagement by 30%.</li>
+          <li>Supported grant and funding initiatives by compiling program data, performance metrics, and impact reports for funding partners.</li>
+          <li>Supported budget oversight and resource allocation, ensuring efficient use of funds and alignment with reporting requirements.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <div class="exp-period">Aug 2023 — Feb 2024</div>
+        <div class="exp-location">Toronto, ON</div>
+        <div class="exp-type">Internship</div>
+      </div>
+      <div>
+        <div class="exp-role">Project Manager</div>
+        <div class="exp-company">SkillHat</div>
+        <ul class="exp-bullets">
+          <li>Led Agile delivery of a travel application MVP, coordinating a 10-member cross-functional team using Scrum practices.</li>
+          <li>Facilitated sprint planning, stand-ups, reviews, and retrospectives to drive continuous improvement and team alignment.</li>
+          <li>Translated user requirements into user stories and managed product backlog to ensure clear scope and iterative delivery.</li>
+          <li>Maintained RAID logs, RACI charts, and sprint artifacts, strengthening governance and structured project execution.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <div class="exp-period">Dec 2023 — Apr 2024</div>
+        <div class="exp-location">Vancouver, BC</div>
+        <div class="exp-type">Volunteer</div>
+      </div>
+      <div>
+        <div class="exp-role">Delivery Analyst</div>
+        <div class="exp-company">Craft Council of BC</div>
+        <ul class="exp-bullets">
+          <li>Led end-to-end delivery of a website migration project, transitioning an outdated platform to a modernized WordPress site aligned with current branding standards.</li>
+          <li>Partnered with cross-functional teams to restructure and rebuild site content, introducing a mobile-responsive design that enhanced accessibility and user engagement.</li>
+          <li>Served as the primary delivery liaison, maintaining stakeholder communication and ensuring milestones and timelines were consistently met.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exp-item reveal">
+      <div class="exp-meta">
+        <div class="exp-period">2020 — 2021</div>
+        <div class="exp-location">Kampala, Uganda</div>
+        <div class="exp-type">Full-time</div>
+      </div>
+      <div>
+        <div class="exp-role">Customer Success Specialist</div>
+        <div class="exp-company">Absa Bank</div>
+        <ul class="exp-bullets">
+          <li>Onboarded and supported 100,000+ customers during a major banking transition, ensuring smooth adoption of products and digital services.</li>
+          <li>Improved customer satisfaction to 90% CSAT through timely, personalized support and clear communication.</li>
+          <li>Identified at-risk accounts through engagement monitoring and implemented targeted interventions to reduce churn.</li>
+          <li>Ensured compliance with KYC, AML, and internal policies while providing tailored financial solutions.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header">
+    <span class="section-num">05</span>
+    <h2 class="section-title">Skills &amp; Tools</h2>
+  </div>
+  <div class="skills-grid">
+    <div class="reveal">
+      <div class="skill-group-title">Technical Tools</div>
+      <ul class="skill-list">
+        <li>Microsoft Project</li><li>Jira</li><li>Asana</li>
+        <li>Notion</li><li>Zapier</li><li>Microsoft Office Suite</li>
+      </ul>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <div class="skill-group-title">Project Management</div>
+      <ul class="skill-list">
+        <li>Risk Management</li><li>Document Control</li><li>Performance Measurement</li>
+        <li>Budget Monitoring</li><li>Stakeholder Engagement</li><li>Continuous Improvement</li>
+      </ul>
+    </div>
+    <div class="reveal reveal-delay-4">
+      <div class="skill-group-title">Interpersonal</div>
+      <ul class="skill-list">
+        <li>Cross-functional Collaboration</li><li>Conflict Resolution</li><li>Facilitation</li>
+        <li>Emotional Intelligence</li><li>Negotiation</li><li>Decision-Making</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <p class="contact-eyebrow">Available for freelance &amp; consulting</p>
+  <h2 class="contact-heading">Let's work<br><em>together.</em></h2>
+  <p class="contact-sub">Have a project that needs structure, a team that needs coordination, or a program that needs a steady hand? Get in touch.</p>
+  <div class="contact-links">
+    <a href="mailto:kusasiradesire27@gmail.com" class="contact-btn primary">kusasiradesire27@gmail.com</a>
+    <a href="tel:2366686909" class="contact-btn secondary">(236) 668-6909</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Desire Kusasira</p>
+  <p>Burnaby, BC · Canada</p>
+  <p>PMP Certified · PMI Member</p>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  (function animCursor() {
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animCursor);
+  })();
+  document.querySelectorAll('a, button, .tag, .stat, .service-card').forEach(el => {
+    el.addEventListener('mouseenter', () => { cursor.style.width = cursor.style.height = '20px'; ring.style.width = ring.style.height = '54px'; });
+    el.addEventListener('mouseleave', () => { cursor.style.width = cursor.style.height = '10px'; ring.style.width = ring.style.height = '36px'; });
+  });
+
+  // Nav scroll + active link
+  const nav = document.getElementById('mainNav');
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+    let current = '';
+    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 130) current = s.id; });
+    navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + current));
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
